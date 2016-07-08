@@ -5,29 +5,28 @@ from optparse import OptionParser
 import sys
 from hcal_teststand.utilities import *
 
-def readIglooSpy_per_card(ts,port,crate, slot, card):
-    result = []
+def readIglooSpy_per_card(port,crate, slot, card, Nsamples=0,ts=None):
+    results = {}
     try:
         cmds1 = ["put HE{0}-{1}-{2}-i_CntrReg_WrEn_InputSpy 1".format(crate, slot, card),
                  "wait 100",
                  "put HE{0}-{1}-{2}-i_CntrReg_WrEn_InputSpy 0".format(crate, slot, card),
                  "get HE{0}-{1}-{2}-i_StatusReg_InputSpyWordNum".format(crate, slot, card)]
-        print cmds1
-        output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmds1, script=True, time_out=200)
-        print output
-        nsamples = output[-1]["result"]
+#        print cmds1
+        output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmds1, script=True)
+        nsamples = int(output[-1]["result"],16) if not Nsamples else min(int(output[-1]["result"],16),Nsamples)
         #print "nsamples: ", int(nsamples,16)
         
         cmds2 = ["get HE{0}-{1}-{2}-i_inputSpy".format(crate, slot, card),
-                 "wait 200"]*(int(nsamples,16))
-        print cmds2
-        output_all = hcal_teststand.ngfec.send_commands(ts=ts, port=port, cmds=cmds2, script=True, time_out=600)
+                 "wait 200"]*nsamples
+#        print cmds2
+        output_all = hcal_teststand.ngfec.send_commands(ts=ts, port=port, cmds=cmds2, script=True)
         #print output_all
-        results[crate, slot, card] = [out["result"] for out in output_all if not out["result"] == "OK"]
+        results[crate, slot, card] = [out["result"] for out in output_all if not (out["result"] == "OK" or out["result"] == "commented command")]
     except Exception as ex:
         print "Caught exception:"
         print ex
-        
+    return results        
 
 def readIglooSpy(tsname):
     results = {}
@@ -43,7 +42,7 @@ def readIglooSpy(tsname):
                              "get HE{0}-{1}-{2}-i_StatusReg_InputSpyWordNum".format(crate, slot, card)]
 
                     print cmds1
-                    output = hcal_teststand.ngfec.send_commands(ts=ts, cmds=cmds1, script=True, time_out=200)
+                    output = hcal_teststand.ngfec.send_commands(ts=ts, cmds=cmds1, script=True)
                     print output
                     nsamples = output[-1]["result"]
                     #print "nsamples: ", int(nsamples,16)
@@ -53,9 +52,9 @@ def readIglooSpy(tsname):
                     #cmds2 = ["get HE{0}-{1}-{2}-i_inputSpy".format(crate, slot, card),
                     #         "wait 200"]*(10)
                     print cmds2
-                    output_all = hcal_teststand.ngfec.send_commands(ts=ts, cmds=cmds2, script=True, time_out=600)
+                    output_all = hcal_teststand.ngfec.send_commands(ts=ts, cmds=cmds2, script=True)
                     #print output_all
-                    results[crate, slot, card] = [out["result"] for out in output_all if not out["result"] == "OK"]
+                    results[crate, slot, card] = [out["result"] for out in output_all if not (out["result"] == "OK" or out["result"] == "commented command")]
                 except Exception as ex:
                     print "Caught exception:"
                     print ex
@@ -139,6 +138,23 @@ def getInfoFromSpy_per_QIE(buff, verbose=False):
             'exp':exp,
             'tdc':tdc}
 
+def getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None, ts=None):
+    output={}
+    spyconts=readIglooSpy_per_card(port,crate, slot, card, Nsamples,ts)
+    for spycontst in spyconts.values()[0]:
+        outdire={}
+        spycont=spycontst.split()
+        nqie=0
+        if verbose: print '\nspy{0}\n'.format(int(spycont[0],16)),
+        for sc in spycont[1:]:
+            outdire['qie{0}'.format(nqie)]=getInfoFromSpy_per_QIE(sc[:-4]) if len(sc)>6 else getInfoFromSpy_per_QIE('0x0')
+            if verbose: print 'qie{0}'.format(nqie),outdire['qie{0}'.format(nqie)]
+            nqie+=1
+            outdire['qie{0}'.format(nqie)]=getInfoFromSpy_per_QIE(sc[-4:]) if len(sc)>6 else (getInfoFromSpy_per_QIE(sc) if len(sc)>2 else getInfoFromSpy_per_QIE('0x0'))
+            if verbose: print 'qie{0}'.format(nqie),outdire['qie{0}'.format(nqie)]
+            nqie+=1
+        output['spy{0}'.format(int(spycont[0],16))]=outdire
+    return output
 
 ## -------------------------------------
 ## -- Get the info on adc, capid, tdc --
