@@ -148,10 +148,10 @@ def getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None
         if verbose: print '\nspy{0}\n'.format(int(spycont[0],16)),
         for sc in spycont[1:]:
             outdire['qie{0}'.format(nqie)]=getInfoFromSpy_per_QIE(sc[:-4]) if len(sc)>6 else getInfoFromSpy_per_QIE('0x0')
-            if verbose: print 'qie{0}'.format(nqie),outdire['qie{0}'.format(nqie)]
+            if verbose: print 'qie{0}\t'.format(nqie),outdire['qie{0}'.format(nqie)]
             nqie+=1
             outdire['qie{0}'.format(nqie)]=getInfoFromSpy_per_QIE(sc[-4:]) if len(sc)>6 else (getInfoFromSpy_per_QIE(sc) if len(sc)>2 else getInfoFromSpy_per_QIE('0x0'))
-            if verbose: print 'qie{0}'.format(nqie),outdire['qie{0}'.format(nqie)]
+            if verbose: print 'qie{0}\t'.format(nqie),outdire['qie{0}'.format(nqie)]
             nqie+=1
         output['spy{0}'.format(int(spycont[0],16))]=outdire
     return output
