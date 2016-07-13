@@ -36,6 +36,22 @@ fecs = 1
 
 %%
 
+name = HEint28
+fe_crates = 4
+be_crates = 50
+ngfec_port = 4342
+uhtr_slots = 12
+uhtr_settings = 1, 55		# This isn't implemented, yet!
+glib_slots = 10			# This is actually an FC7, and it's not in slot 10.
+mch_ips = 192.168.1.51		# This is in Crate 50, I don't know what the MCH for Crate 53 is
+amc13_ips = 192.168.2.139, 192.168.2.138 # Crate 53, the IPs for Crate 50 are 192.168.2.137, 192.168.2.136
+qie_slots = 4
+control_hub = cmshcal21
+fecs = 1
+
+%%
+
+
 name = bhm
 fe_crates = 1
 be_crates = 100
