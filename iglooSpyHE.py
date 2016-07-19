@@ -145,7 +145,7 @@ def getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None
         outdire={}
         spycont=spycontst.split()
         nqie=0
-        if verbose: print '\nspy{0}\n'.format(int(spycont[0],16)),
+        if verbose: print '\nspy_word #{0}\n'.format(int(spycont[0],16)),
         for sc in spycont[1:]:
             outdire['qie{0}'.format(nqie)]=getInfoFromSpy_per_QIE(sc[:-4]) if len(sc)>6 else getInfoFromSpy_per_QIE('0x0')
             if verbose: print 'qie{0}\t'.format(nqie),outdire['qie{0}'.format(nqie)]
@@ -154,6 +154,10 @@ def getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None
             if verbose: print 'qie{0}\t'.format(nqie),outdire['qie{0}'.format(nqie)]
             nqie+=1
         output['spy{0}'.format(int(spycont[0],16))]=outdire
+    if verbose:
+        leftn=hcal_teststand.ngfec.send_commands(ts=None, port=port,cmds=["get HE{0}-{1}-{2}-i_StatusReg_InputSpyWordNum".format(crate, slot, card)], script=True)[0]
+        print '\n',leftn['cmd'],'#',leftn['result']
+    print 'NOTE THAT THE SPY FIFO WILL RETAIN OLD DATA UNTIL YOU FLUSH IT OR RESET IT !'
     return output
 
 ## -------------------------------------

@@ -229,6 +229,7 @@ def  getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=Non
     if verbose:
         leftn=hcal_teststand.ngfec.send_commands(ts=None, port=port,cmds=["get HF{0}-{1}-i{2}_StatusReg_InputSpyWordNum".format(crate, slot, TB[card])], script=True)[0]
         print '\n',leftn['cmd'],'#',leftn['result']
+    print 'NOTE THAT THE SPY FIFO WILL RETAIN OLD DATA UNTIL YOU FLUSH IT OR RESET IT !'
     return output
 
 ## -------------------------------------
