@@ -17,12 +17,12 @@ def readIglooSpy_per_card(port, crate, slot, topbottom, Nsamples=0,ts=None):
                 "wait 100",
                 "put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 0".format(crate, slot,TB[topbottom]),
                 "get HF{0}-{1}-i{2}_StatusReg_InputSpyWordNum".format(crate, slot, TB[topbottom])]
-        output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmds1, script=True)
+        output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmd1, script=True)
         nsamples = int(output[-1]["result"],16) if not Nsamples else min(int(output[-1]["result"],16),Nsamples) 
         cmd2 = ["get HF{0}-{1}-iTop_inputSpy".format(crate, slot, TB[topbottom]),
                  "wait 200"]*nsamples
 #        print cmds2
-        output_all = hcal_teststand.ngfec.send_commands(ts=ts, port=port, cmds=cmds2, script=True)
+        output_all = hcal_teststand.ngfec.send_commands(ts=ts, port=port, cmds=cmd2, script=True)
         #print output_all
         results[crate, slot, TB[topbottom]] = [out["result"] for out in output_all if not (out["result"] == "OK" or out["result"] == "commented command")]
     except Exception as ex:
