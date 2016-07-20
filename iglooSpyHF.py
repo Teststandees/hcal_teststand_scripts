@@ -206,9 +206,10 @@ def getInfoFromSpy_per_QIE(buff, verbose=False):
             'exp':exp,
             'tdc':tdc}
 
-def  getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None, ts=None):
+def  getInfoFromSpy_per_card(port,crate, slot, isTop, verbose=False, Nsamples=None, ts=None):
+    card=isTop
     if not (card==0 or card==1):
-        print 'ERROR: parameter topbottom --- 1 for top, 0 for bottom'
+        print 'ERROR: parameter isTop --- 1 for top, 0 for bottom'
         return result
     TB=['Bot','Top']
     output={}

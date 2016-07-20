@@ -48,8 +48,7 @@ def send_commands(ts=None, control_hub=None, port=port_default, cmds=cmds_defaul
 		# Prepare the ngfec arguments:
 		ngfec_cmd = 'ngFEC.exe -z -c -p {0}'.format(port)
 		if control_hub != None:
-#			ngfec_cmd += " -H {0}".format(control_hub)
-			ngfec_cmd += " -H {0}".format("hcal904daq02")
+			ngfec_cmd += " -H {0}".format(control_hub)
 		# Send the ngfec commands:
 #		print ngfec_cmd
 		p = pexpect.spawn(ngfec_cmd)
@@ -107,7 +106,7 @@ def send_commands(ts=None, control_hub=None, port=port_default, cmds=cmds_defaul
 			return output
 
 def killall():
-	p = pexpect.spawn('killall ngccm')		# Run script.
+	p = pexpect.spawn('./killccm.sh')		# Run script.
 	p.expect(pexpect.EOF)		# Wait for the script to finish.
 	raw_output = p.before.strip()		# Collect all of the script's output.
 	return raw_output
