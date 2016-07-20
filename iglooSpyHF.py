@@ -9,9 +9,9 @@ import monitor_teststand
 def readIglooSpy_per_card(port, crate, slot, topbottom, Nsamples=0,ts=None):
     results = {}
     if not (topbottom==0 or topbottom==1):
-        print 'ERROR: parameter topbottom --- 0 for top, 1 for bottom'
+        print 'ERROR: parameter topbottom --- 1 for top, 0 for bottom'
         return results
-    TB=['Top','Bot']
+    TB=['Bot','Top']
     try:
         cmd1 = ["put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 1".format(crate, slot, TB[topbottom]),
                 "wait 100",
@@ -208,9 +208,9 @@ def getInfoFromSpy_per_QIE(buff, verbose=False):
 
 def  getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None, ts=None):
     if not (card==0 or card==1):
-        print 'ERROR: parameter topbottom --- 0 for top, 1 for bottom'
+        print 'ERROR: parameter topbottom --- 1 for top, 0 for bottom'
         return result
-    TB=['Top','Bot']
+    TB=['Bot','Top']
     output={}
     spyconts=readIglooSpy_per_card(port,crate, slot, card, Nsamples,ts)
     for spycontst in spyconts.values()[0]:
