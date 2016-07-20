@@ -7,10 +7,10 @@ from hcal_teststand.utilities import *
 import monitor_teststand
 
 def readIglooSpy_per_card(port, crate, slot, topbottom, Nsamples=0,ts=None):
-    result = {}
+    results = {}
     if not (topbottom==0 or topbottom==1):
         print 'ERROR: parameter topbottom --- 0 for top, 1 for bottom'
-        return result
+        return results
     TB=['Top','Bot']
     try:
         cmd1 = ["put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 1".format(crate, slot, TB[topbottom]),
