@@ -93,9 +93,9 @@ def record(ts=False,c=False,path="data/unsorted", scale=0):
 	log = "%% TIMES\n{0}\n{1}\n\n".format(t0, t1) + log
 	isreg=[line for line in log.split('%% IGLOOSPY\n')[0].split('\n') if '->' in line]
 	badrate=len([line for line in isreg if 'ERROR!!' in line])*100/len(isreg)
-	if badrate>50:err['register']='logger on hcal904daq01 cannot read registers, bad register rate: {0}%'.format(badrate)
+	if badrate>50:err['register']='logger cannot read registers, bad register rate: {0}%'.format(badrate)
 	errs='\n'.join(err.values())
-	if errs:	os.system("ssh cms904usr mail -s 'logger_information' yw5mj@virginia.edu jmariano@terpmail.umd.edu whitbeck.andrew@gmail.com<<EOF\nERROR in {0}.log:\n\n{1}\nEOF".format(t_string,errs))
+	if errs:	os.system("mail -s 'logger_information' yanchu@cern.ch <<EOF\nERROR in {0}.log:\n\n{1}\nEOF".format(t_string,errs))
 	# Write log:
 	path += "/{0}".format(t_string[:-7])
 	scale_string = ""
