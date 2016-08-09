@@ -140,6 +140,9 @@ def getInfoFromSpy_per_QIE(buff, verbose=False):
 
 def getInfoFromSpy_per_card(port,crate, slot, card, verbose=False, Nsamples=None, ts=None):
     output={}
+    if sys.version_info<(2,6):
+        print >> sys.stderr, "ERROR: python version older than python2.6"
+        return output
     spyconts=readIglooSpy_per_card(port,crate, slot, card, Nsamples,ts)
     for spycontst in spyconts.values()[0]:
         outdire={}

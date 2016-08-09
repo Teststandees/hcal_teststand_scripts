@@ -208,11 +208,14 @@ def getInfoFromSpy_per_QIE(buff, verbose=False):
 
 def  getInfoFromSpy_per_card(port,crate, slot, isTop, verbose=False, Nsamples=None, ts=None):
     card=isTop
-    if not (card==0 or card==1):
-        print 'ERROR: parameter isTop --- 1 for top, 0 for bottom'
-        return result
     TB=['Bot','Top']
     output={}
+    if sys.version_info<(2,6):
+        print >> sys.stderr, "ERROR: python version older than python2.6"
+        return output
+    if not (card==0 or card==1):
+        print >> sys.stderr, 'ERROR: parameter isTop --- 1 for top, 0 for bottom'
+        return output
     spyconts=readIglooSpy_per_card(port,crate, slot, card, Nsamples,ts)
     for spycontst in spyconts.values()[0]:
         outdire={}
