@@ -12,7 +12,8 @@ def readIglooSpy_per_card(port,crate, slot, card, Nsamples=0,ts=None):
                  "wait 100",
                  "put HE{0}-{1}-{2}-i_CntrReg_WrEn_InputSpy 0".format(crate, slot, card),
                  "get HE{0}-{1}-{2}-i_StatusReg_InputSpyWordNum".format(crate, slot, card)]
-#        print cmds1
+        print "put HE{0}-{1}-{2}-i_CntrReg_WrEn_InputSpy 1".format(crate, slot, card)
+        print "put HE{0}-{1}-{2}-i_CntrReg_WrEn_InputSpy 0".format(crate, slot, card)
         output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmds1, script=True)
         nsamples = int(output[-1]["result"],16) if not Nsamples else min(int(output[-1]["result"],16),Nsamples)
         #print "nsamples: ", int(nsamples,16)
@@ -259,46 +260,31 @@ if __name__ == "__main__":
     #            '0x17 0x70767274 0x70767272 0x70767074 0x70767074 0x70747270 0x70767272']
 
     parser = OptionParser()
-    parser.add_option("--sleep", dest="sleep",
-                      default=10, metavar="N", type="float",
-                      help="Sleep for %metavar minutes in between data runs (default: %default)",
+    parser.add_option("--port", dest="port",
+                      default=4342, type="int",
+                      help="The ngCCM port number (default: %default)",
                       )
-    parser.add_option("-t", "--teststand", dest="tstype",
-                      type="string",
-                      help="Which teststand to set up?"
+    parser.add_option("--crate", dest="crate",
+                      default="0", type="string",
+                      help="The crate string (default: 0)",
                       )
-    
+    parser.add_option("--slot", dest="slot",
+                      default=0, type="int",
+                      help="The slot string (default: 0)",
+                      )
+    parser.add_option("--card", dest="card",
+                      default=0, type="int",
+                      help="The card string (default: 0)",
+                      )
+    parser.add_option("--nsamples", dest="nsamples",
+                      default=1, type="int",
+                      help="number of samples to be read out (default: 1)",
+                      )
+
     (options, args) = parser.parse_args()
-    
-    if not options.tstype:
-        print "Please specify which teststand to use!"
-        sys.exit()
-    tstype = options.tstype
+    getInfoFromSpy_per_card(options.port,options.crate,options.slot,options.card,True,options.nsamples,None)
 
-    try:
-        while True:
-            t_string = time_string()[:-4]
-            path = "data/ts_{0}/spy_{1}.txt".format(tstype,t_string)
-            bufflist_dict = readIglooSpy(tstype)
 
-            f = open(path,'w')
-            for crate_slot_card, bufflist in bufflist_dict.iteritems():
-                crate, slot, card = crate_slot_card
-                f.write("Crate {}, RM {}, QIE card {}".format(crate, slot, card))
-                f.write("\n".join(bufflist))
-            
-                #f = open("testigloospy.txt")
-                #bufflist = f.readlines()
-
-                parsed_info_list = getInfoFromSpy(bufflist)
-
-                print capidRotating(parsed_info_list)
-
-            f.close()
-            sleep(60*options.sleep)
-    except KeyboardInterrupt:
-        print "bye!"
-        sys.exit()
 
 
     

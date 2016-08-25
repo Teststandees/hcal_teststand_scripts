@@ -4,7 +4,6 @@ from time import sleep
 from optparse import OptionParser
 import sys
 from hcal_teststand.utilities import *
-import monitor_teststand
 
 def readIglooSpy_per_card(port, crate, slot, topbottom, Nsamples=0,ts=None):
     results = {}
@@ -17,6 +16,8 @@ def readIglooSpy_per_card(port, crate, slot, topbottom, Nsamples=0,ts=None):
                 "wait 100",
                 "put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 0".format(crate, slot,TB[topbottom]),
                 "get HF{0}-{1}-i{2}_StatusReg_InputSpyWordNum".format(crate, slot, TB[topbottom])]
+        print "put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 1".format(crate, slot, TB[topbottom])
+        print "put HF{0}-{1}-i{2}_CntrReg_WrEn_InputSpy 0".format(crate, slot, TB[topbottom])
         output = hcal_teststand.ngfec.send_commands(ts=ts, port=port,cmds=cmd1, script=True)
         nsamples = int(output[-1]["result"],16) if not Nsamples else min(int(output[-1]["result"],16),Nsamples) 
         cmd2 = ["get HF{0}-{1}-iTop_inputSpy".format(crate, slot, TB[topbottom]),
@@ -375,79 +376,32 @@ if __name__ == "__main__":
     #            '0x17 0x70767274 0x70767272 0x70767074 0x70767074 0x70747270 0x70767272']
 
     parser = OptionParser()
-    parser.add_option("--sleep", dest="sleep",
-                      default=10, metavar="N", type="float",
-                      help="Sleep for %metavar minutes in between data runs (default: %default)",
+    parser.add_option("--port", dest="port",
+                      default=4342, type="int",
+                      help="The ngCCM port number (default: %default)",
                       )
-    parser.add_option("-t", "--teststand", dest="tstype",
-                      default = "igloo_spy",
-                      type="string",
-                      help="Which teststand to set up?"
+    parser.add_option("--crate", dest="crate",
+                      default="0", type="string",
+                      help="The crate string (default: 0)",
                       )
-    parser.add_option("-c", "--capidonly", dest="cid_only",
-                      default = 0,
-                      type="int",
-                      help="1 = display CapID only,  0 = normal mode"
+    parser.add_option("--slot", dest="slot",
+                      default=0, type="int",
+                      help="The slot string (default: 0)",
                       )
-    parser.add_option("-n", "--numts", dest="numts",
-                      default = 100,
-                      type="int",
-                      help="number of TS to capture -- 200 MAX"
+    parser.add_option("--isTop", dest="istop",
+                      default=0, type="int",
+                      help="1 for top igloo, 0 for bottom igloo  (default: 0)",
                       )
-    
+    parser.add_option("--nsamples", dest="nsamples",
+                      default=1, type="int",
+                      help="number of samples to be read out (default: 1)",
+                      )
+
     (options, args) = parser.parse_args()
+    getInfoFromSpy_per_card(options.port,options.crate,options.slot,options.istop,True,options.nsamples,None)
 
-    if not options.tstype:
-        print "Please specify which teststand to use!"
-        sys.exit()
-    tstype = options.tstype
 
-    try:
- #       while True:
-        t_string = time_string()[:-4]
-        path = "./spies/spy_{0}.txt".format(t_string)
-            
-        bufflist_dict = readIglooSpy(tstype,options.numts)
-        
-#        f = open(path,'w')
-        #emailbody = ""
-            
-        for crate_slot, bufflist in bufflist_dict.iteritems():
-         #   crate, slot = crate_slot
-                #print crate, slot, card
-         #   f.write("HF{0}, Slot {1}\n".format(crate, slot))
-         #   f.write("Raw readings\n")
-         #   f.write("\n".join(bufflist))
-         #   f.write("\n")
-                
-                #f = open("testigloospy.txt")
-                #bufflist = f.readlines()
 
-            parsed_info_list = getInfoFromSpy(bufflist,options.cid_only)
-            clear_buffer(tstype)
-                #print parsed_info_list
-                #f.write("Parsed info\n")
-                #f.write("\n".join([",".join(info) for info in parsed_info_list]))
-                #f.write("\n")
-
-        #    cap = capidRotating(parsed_info_list)
-        #    if not cap[0]:
-        #        print "Capid problem, check logs"
-        #        f.write(cap[1]+"\n")
-                    #emailbody += "Capid problems for Crate {0}, RM {1}, QIE card {2}\n".format(crate, slot, card)
-        #    f.write("\n")
-
-        #f.close()
-        #if emailbody != "":
-                #monitor_teststand.send_email(subject="Capid error for teststand {0}".format(tstype), body=emailbody)
-         #   pass
-#            print "Waiting {0} minutes till the next check".format(options.sleep)
-#            sleep(60*options.sleep)
-    except KeyboardInterrupt:
-        print "bye!"
-        sys.exit()
-    except Exception as ex:
-        print ex
 
 
     
