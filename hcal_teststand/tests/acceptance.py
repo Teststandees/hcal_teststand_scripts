@@ -57,6 +57,11 @@ class acceptance:
 			help="FE slot (default is 2)",
 			metavar="INT"
 		)
+		parser.add_option("-x", "--RMX", dest="x",
+			default=2,
+			help="FE RBX (default is 2)",
+			metavar="INT"
+		)
 		parser.add_option("-C", "--becrate", dest="C",
 			default=53,
 			help="BE crate (default is 53)",
@@ -65,6 +70,11 @@ class acceptance:
 		parser.add_option("-S", "--beslot", dest="S",
 			default=1,
 			help="BE slot (default is 1)",
+			metavar="INT"
+		)
+		parser.add_option("-p", "--port", dest="p",
+			default=4243,
+			help="port",
 			metavar="INT"
 		)
 		parser.add_option("-l", "--link", dest="l",
@@ -89,8 +99,10 @@ class acceptance:
 		
 		## Assign variables:
 		self.ts_name = options.ts
+		self.ng_port = int(options.p)
 		self.fe_crate = int(options.c)
 		self.fe_slot = int(options.s)
+		self.fe_RBX = int(options.x)
 		self.be_crate = int(options.C)
 		self.be_slot = int(options.S)
 		self.i_link = int(options.l)
